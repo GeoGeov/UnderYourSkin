@@ -11,8 +11,13 @@ config_version=5
 [application]
 
 config/name="UnderYourSkin"
+run/main_scene="uid://d1ktphnr8qiro"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.svg"
+
+[global_group]
+
+RoomLimits="Room Camera Limiters"
 
 [physics]
 

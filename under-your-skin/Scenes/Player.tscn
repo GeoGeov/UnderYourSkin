@@ -1,0 +1,117 @@
+[gd_scene format=3 uid="uid://dd2br7mjkxcbp"]
+
+[ext_resource type="Texture2D" uid="uid://btw12d4ef4x7b" path="res://Sprites/PlayerSpriteSheet.png" id="1_rpqav"]
+
+[sub_resource type="GDScript" id="GDScript_rpqav"]
+resource_name = "PlayerMovement"
+script/source = "extends CharacterBody2D
+
+
+const SPEED = 300.0
+const JUMP_VELOCITY = -400.0
+
+func _physics_process(delta: float) -> void:
+	# Add the gravity.
+	if not is_on_floor():
+		velocity += get_gravity() * delta
+
+	# Handle jump.
+	if Input.is_action_just_pressed(\"ui_accept\") and is_on_floor():
+		velocity.y = JUMP_VELOCITY
+
+	# Get the input direction and handle the movement/deceleration.
+	# As good practice, you should replace UI actions with custom gameplay actions.
+	var direction := Input.get_axis(\"ui_left\", \"ui_right\")
+	if direction:
+		velocity.x = direction * SPEED
+	else:
+		velocity.x = move_toward(velocity.x, 0, SPEED)
+
+	move_and_slide()
+"
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_kyqiw"]
+radius = 6.0
+height = 14.0
+
+[sub_resource type="GDScript" id="GDScript_kyqiw"]
+resource_name = "Camera Movement"
+script/source = "extends Node2D
+@export var max_offset: float = 3   # how far eyes can move from center (pixels)
+@export var follow_speed: float = 10.0  # how fast eyes catch up to target
+
+@onready var eyes: Node2D = $Camera2D/Eyes
+
+var target_offset: Vector2 = Vector2.ZERO
+var current_offset: Vector2 = Vector2.ZERO
+
+func _process(delta: float) -> void:
+		var mouse_pos = get_global_mouse_position()
+		var to_mouse = mouse_pos - global_position
+	
+		#if 0 here to prevent bugs, cause normalize freaks out
+		if to_mouse == Vector2.ZERO:
+			target_offset = Vector2.ZERO
+		else:
+			var dir = to_mouse.normalized()
+			#off set around player
+			target_offset = dir * max_offset  # stays in a circle around center
+			if dir.x < 0:
+				eyes.flip_h = true 
+			else:
+				eyes.flip_h = false
+		# smooth lag done using lerp
+		current_offset = current_offset.lerp(target_offset, follow_speed * delta)
+		#apply offset, also changes camera pov cause childed
+		position = current_offset
+
+@onready var cam: Camera2D = $Camera2D
+func _on_area_2d_area_entered(area):
+	
+	if area.is_in_group(\"RoomLimits\"):
+		var collision_shape = area.get_node(\"CollisionShape2D\")
+		var size = collision_shape.shape.extents*2
+		cam.limit_left = collision_shape.global_position.x - size.x/2
+		cam.limit_right = collision_shape.global_position.x + size.x/2
+		cam.limit_top = collision_shape.global_position.y - size.y/2
+		cam.limit_bottom = collision_shape.global_position.y + size.y/2
+"
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_rpqav"]
+
+[node name="CharacterBody2D" type="CharacterBody2D" unique_id=828766811]
+texture_filter = 1
+script = SubResource("GDScript_rpqav")
+
+[node name="PlayerSprite" type="Sprite2D" parent="." unique_id=543191214]
+texture = ExtResource("1_rpqav")
+region_enabled = true
+region_rect = Rect2(0, 0, 16, 16)
+
+[node name="PlatformCollide" type="CollisionShape2D" parent="." unique_id=1601454805]
+shape = SubResource("CapsuleShape2D_kyqiw")
+
+[node name="CameraOrigin" type="Node2D" parent="." unique_id=329838742]
+script = SubResource("GDScript_kyqiw")
+max_offset = 4.0
+follow_speed = 3.0
+
+[node name="Area2D" type="Area2D" parent="CameraOrigin" unique_id=2059815869]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CameraOrigin/Area2D" unique_id=1739335993]
+scale = Vector2(2.435014, 2.435014)
+shape = SubResource("RectangleShape2D_rpqav")
+
+[node name="Camera2D" type="Camera2D" parent="CameraOrigin" unique_id=1742324551]
+zoom = Vector2(2, 2)
+limit_left = -500
+limit_top = -500
+limit_right = 500
+limit_bottom = 500
+position_smoothing_enabled = true
+editor_draw_screen = false
+
+[node name="Eyes" type="Sprite2D" parent="CameraOrigin/Camera2D" unique_id=1426816156]
+texture = ExtResource("1_rpqav")
+region_enabled = true
+region_rect = Rect2(22, 4, 6, 4)

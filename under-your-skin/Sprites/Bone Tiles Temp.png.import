@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://btw12d4ef4x7b"
-path="res://.godot/imported/PlayerSpriteSheet.png-d72a160ece3f69390b8beacc09b7c17e.ctex"
+uid="uid://bvh5xnbec4r8b"
+path="res://.godot/imported/Bone Tiles Temp.png-997e039f1a378213c17b4ce25c26bdc4.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Sprites/PlayerSpriteSheet.png"
-dest_files=["res://.godot/imported/PlayerSpriteSheet.png-d72a160ece3f69390b8beacc09b7c17e.ctex"]
+source_file="res://Sprites/Bone Tiles Temp.png"
+dest_files=["res://.godot/imported/Bone Tiles Temp.png-997e039f1a378213c17b4ce25c26bdc4.ctex"]
 
 [params]
 
